@@ -1,50 +1,37 @@
-# React + TypeScript + Vite
+# MazeTon 🎮
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A captivating 3D maze game built with React and Three.js, where players navigate through dynamically generated mazes with intuitive controls and rewarding victory animations. The game is designed for both desktop and mobile devices, with swipe controls on mobile for immersive gameplay.
 
-Currently, two official plugins are available:
+## Features 🚀
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Dynamic Maze Generation**: Each new game features a unique, randomly generated maze.
+- **Interactive Controls**:
+  - **Desktop**: Use arrow keys or WASD to navigate the maze.
+  - **Mobile**: Swipe controls allow movement in all directions.
+- **Intuitive UI**:
+  - Header with score tracking, mute button, and MiniMap toggle.
+  - Mobile-friendly navigation for easy access across screens.
 
-## Expanding the ESLint configuration
+## Gameplay 🎲
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+1. **Start a New Game**: Generate a new maze.
+2. **Navigate the Maze**:
+   - On desktop, use arrow keys or WASD to move the player.
+   - On mobile, swipe in any direction to traverse the maze.
+3. **Reach the Finish**: Find the exit to win the game.
+4. **Celebrate**: Your growing score with each completed maze.
 
-- Configure the top-level `parserOptions` property like this:
+## Technology Stack 🛠️
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+- **React**: For building the UI and managing component-based architecture.
+- **Three.js & @react-three/fiber**: For 3D rendering and handling the game environment.
+- **TypeScript**: Type-safe code, ensuring reliability and readability.
+- **React Icons**: For sleek, accessible icons in the UI.
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## License 📄
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+This project is open-source and available under the MIT License.
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+---
+
+Enjoy exploring the mazes! 🧩
