@@ -26,7 +26,7 @@ const MiniMap: React.FC<MiniMapProps> = ({
   const wallColor = "#6d9bb5";
 
   return (
-    <div className="fixed top-20 right-4 bg-gray-800 bg-opacity-80 p-2 rounded shadow-md text-white">
+    <div className="fixed top-20 right-4 bg-gray-800 bg-opacity-80 p-2 rounded shadow-md text-white z-10">
       <div
         style={{
           display: "grid",

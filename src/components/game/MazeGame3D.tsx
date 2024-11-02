@@ -7,14 +7,14 @@ import Loading from "@/components/game/Loading";
 import MazeRenderer from "@/components/game/MazeRenderer";
 import MiniMap from "@/components/game/MiniMap";
 import {
+  initializeSounds,
   isMuted,
-  pauseMusic,
-  playMusic,
+  playSound,
+  setSoundsMute,
   toggleGlobalMute,
-} from "@/lib/backgroundMusic";
-import { playSound, setSoundsMute } from "@/lib/soundEffects";
+} from "@/lib/soundEffects";
 import { Canvas } from "@react-three/fiber";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
 type Cell = {
@@ -36,7 +36,7 @@ const MazeGame3D: React.FC = () => {
     new THREE.Vector3(0, 0, 0)
   );
   const [finishPosition, setFinishPosition] = useState({ x: 1, y: 1 });
-  const [mazeSize, setMazeSize] = useState({ width: 2, height: 2 });
+  const [mazeSize, setMazeSize] = useState({ width: 20, height: 20 });
   const [gameWon, setGameWon] = useState(false);
   const [resetCamera, setResetCamera] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -51,11 +51,6 @@ const MazeGame3D: React.FC = () => {
     setSoundsMute(isMuted());
     setIsSoundMuted(isMuted());
   };
-
-  useEffect(() => {
-    playMusic();
-    return () => pauseMusic();
-  }, []);
 
   useEffect(() => {
     if (gameWon) {
@@ -110,6 +105,8 @@ const MazeGame3D: React.FC = () => {
 
   const generateMaze = useCallback(() => {
     setLoading(true);
+
+    initializeSounds();
 
     const newMaze: Cell[][] = Array.from({ length: mazeSize.height }, (_, y) =>
       Array.from({ length: mazeSize.width }, (_, x) => ({
@@ -275,6 +272,111 @@ const MazeGame3D: React.FC = () => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
+
+  const SCROLL_THRESHOLD = 40;
+  const THROTTLE_TIMEOUT = 300; // milliseconds
+
+  // Detect swipe gestures for mobile
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const lastScrollTime = useRef(0);
+
+  console.log(lastScrollTime);
+
+  // Detect swipe gestures for mobile
+  const handleTouchStart = useCallback((event: TouchEvent) => {
+    if (event.touches.length === 1) {
+      event.preventDefault();
+      touchStartX.current = event.touches[0].clientX;
+      touchStartY.current = event.touches[0].clientY;
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback(
+    (event: TouchEvent) => {
+      if (event.changedTouches.length === 1) {
+        event.preventDefault();
+
+        const touchEndX = event.changedTouches[0].clientX;
+        const touchEndY = event.changedTouches[0].clientY;
+
+        const dx = touchEndX - touchStartX.current;
+        const dy = touchEndY - touchStartY.current;
+
+        if (Math.abs(dx) > Math.abs(dy)) {
+          // Horizontal swipe
+          if (dx > 0) {
+            movePlayer(1, 0); // Swipe right
+          } else {
+            movePlayer(-1, 0); // Swipe left
+          }
+        } else {
+          // Vertical swipe
+          if (dy > 0) {
+            movePlayer(0, 1); // Swipe down
+          } else {
+            movePlayer(0, -1); // Swipe up
+          }
+        }
+      }
+    },
+    [movePlayer]
+  );
+
+  // Throttled scroll-based movement
+  const handleWheel = useCallback(
+    (event: WheelEvent) => {
+      event.preventDefault(); // Prevent default page scroll behavior
+
+      const now = Date.now();
+      if (now - lastScrollTime.current < THROTTLE_TIMEOUT) return; // Throttle scroll events
+
+      // Check for significant scroll threshold
+      if (
+        Math.abs(event.deltaY) > SCROLL_THRESHOLD ||
+        Math.abs(event.deltaX) > SCROLL_THRESHOLD
+      ) {
+        if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
+          // Vertical scroll
+          if (event.deltaY > 0) {
+            movePlayer(0, 1); // Scroll down
+          } else {
+            movePlayer(0, -1); // Scroll up
+          }
+        } else {
+          // Horizontal scroll
+          if (event.deltaX > 0) {
+            movePlayer(1, 0); // Scroll right
+          } else {
+            movePlayer(-1, 0); // Scroll left
+          }
+        }
+
+        lastScrollTime.current = now; // Update last scroll time
+      }
+    },
+    [movePlayer]
+  );
+
+  useEffect(() => {
+    // Keyboard event listener for desktop
+    window.addEventListener("keydown", handleKeyDown);
+
+    // Touch event listeners for swipe detection on mobile
+    window.addEventListener("touchstart", handleTouchStart, { passive: false });
+    window.addEventListener("touchend", handleTouchEnd, { passive: false });
+
+    // Wheel event listener for desktop scroll control
+    window.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      // Cleanup event listeners on unmount
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchend", handleTouchEnd);
+      window.removeEventListener("wheel", handleWheel);
+    };
+  }, [handleKeyDown, handleTouchStart, handleTouchEnd, handleWheel]);
 
   return (
     <div className="flex flex-col items-center justify-center h-screen w-screen overflow-hidden bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white">
