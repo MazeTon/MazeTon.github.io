@@ -36,7 +36,7 @@ const MazeGame3D: React.FC = () => {
     new THREE.Vector3(0, 0, 0)
   );
   const [finishPosition, setFinishPosition] = useState({ x: 1, y: 1 });
-  const [mazeSize, setMazeSize] = useState({ width: 20, height: 20 });
+  const [mazeSize, setMazeSize] = useState({ width: 2, height: 2 });
   const [gameWon, setGameWon] = useState(false);
   const [resetCamera, setResetCamera] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -275,6 +275,7 @@ const MazeGame3D: React.FC = () => {
 
   const SCROLL_THRESHOLD = 40;
   const THROTTLE_TIMEOUT = 300; // milliseconds
+  const SWIPE_THRESHOLD = 20; // Minimum movement in pixels to be considered a swipe
 
   // Detect swipe gestures for mobile
   const touchStartX = useRef(0);
@@ -301,19 +302,21 @@ const MazeGame3D: React.FC = () => {
         const dx = touchEndX - touchStartX.current;
         const dy = touchEndY - touchStartY.current;
 
-        if (Math.abs(dx) > Math.abs(dy)) {
-          // Horizontal swipe
-          if (dx > 0) {
-            movePlayer(-1, 0); // Swipe right
+        if (Math.abs(dx) > SWIPE_THRESHOLD || Math.abs(dy) > SWIPE_THRESHOLD) {
+          if (Math.abs(dx) > Math.abs(dy)) {
+            // Horizontal swipe
+            if (dx > 0) {
+              movePlayer(-1, 0); // Swipe right
+            } else {
+              movePlayer(1, 0); // Swipe left
+            }
           } else {
-            movePlayer(1, 0); // Swipe left
-          }
-        } else {
-          // Vertical swipe
-          if (dy > 0) {
-            movePlayer(0, -1); // Swipe down
-          } else {
-            movePlayer(0, 1); // Swipe up
+            // Vertical swipe
+            if (dy > 0) {
+              movePlayer(0, -1); // Swipe down
+            } else {
+              movePlayer(0, 1); // Swipe up
+            }
           }
         }
       }
