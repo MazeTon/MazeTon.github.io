@@ -294,8 +294,6 @@ const MazeGame3D: React.FC = () => {
   const handleTouchEnd = useCallback(
     (event: TouchEvent) => {
       if (event.changedTouches.length === 1) {
-        event.preventDefault();
-
         const touchEndX = event.changedTouches[0].clientX;
         const touchEndY = event.changedTouches[0].clientY;
 
@@ -303,6 +301,8 @@ const MazeGame3D: React.FC = () => {
         const dy = touchEndY - touchStartY.current;
 
         if (Math.abs(dx) > SWIPE_THRESHOLD || Math.abs(dy) > SWIPE_THRESHOLD) {
+          event.preventDefault();
+
           if (Math.abs(dx) > Math.abs(dy)) {
             // Horizontal swipe
             if (dx > 0) {
