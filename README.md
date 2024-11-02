@@ -1,5 +1,9 @@
 # MazeTon 🎮
 
+<div style="text-align:center" align="center">
+    <img src="https://raw.githubusercontent.com/mazeton/mazeton.github.io/master/public/logo.png" width="400">
+</div>
+
 A captivating 3D maze game built with React and Three.js, where players navigate through dynamically generated mazes with intuitive controls and rewarding victory animations. The game is designed for both desktop and mobile devices, with swipe controls on mobile for immersive gameplay.
 
 ## Features 🚀
