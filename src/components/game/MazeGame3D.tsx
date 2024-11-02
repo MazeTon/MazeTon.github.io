@@ -281,8 +281,6 @@ const MazeGame3D: React.FC = () => {
   const touchStartY = useRef(0);
   const lastScrollTime = useRef(0);
 
-  console.log(lastScrollTime);
-
   // Detect swipe gestures for mobile
   const handleTouchStart = useCallback((event: TouchEvent) => {
     if (event.touches.length === 1) {
@@ -306,16 +304,16 @@ const MazeGame3D: React.FC = () => {
         if (Math.abs(dx) > Math.abs(dy)) {
           // Horizontal swipe
           if (dx > 0) {
-            movePlayer(1, 0); // Swipe right
+            movePlayer(-1, 0); // Swipe right
           } else {
-            movePlayer(-1, 0); // Swipe left
+            movePlayer(1, 0); // Swipe left
           }
         } else {
           // Vertical swipe
           if (dy > 0) {
-            movePlayer(0, 1); // Swipe down
+            movePlayer(0, -1); // Swipe down
           } else {
-            movePlayer(0, -1); // Swipe up
+            movePlayer(0, 1); // Swipe up
           }
         }
       }
