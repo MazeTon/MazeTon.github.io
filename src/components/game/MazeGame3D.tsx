@@ -281,6 +281,7 @@ const MazeGame3D: React.FC = () => {
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const lastScrollTime = useRef(0);
+  const gameAreaRef = useRef<HTMLDivElement>(null);
 
   // Detect swipe gestures for mobile
   const handleTouchStart = useCallback((event: TouchEvent) => {
@@ -360,23 +361,28 @@ const MazeGame3D: React.FC = () => {
   );
 
   useEffect(() => {
-    // Keyboard event listener for desktop
-    window.addEventListener("keydown", handleKeyDown);
+    const gameArea = gameAreaRef.current;
 
-    // Touch event listeners for swipe detection on mobile
-    window.addEventListener("touchstart", handleTouchStart, { passive: false });
-    window.addEventListener("touchend", handleTouchEnd, { passive: false });
+    if (gameArea) {
+      // Keyboard event listener for desktop
+      window.addEventListener("keydown", handleKeyDown);
 
-    // Wheel event listener for desktop scroll control
-    window.addEventListener("wheel", handleWheel, { passive: false });
+      // Touch event listeners for swipe detection on mobile
+      gameArea.addEventListener("touchstart", handleTouchStart, {
+        passive: false,
+      });
+      gameArea.addEventListener("touchend", handleTouchEnd, { passive: false });
 
-    return () => {
-      // Cleanup event listeners on unmount
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchend", handleTouchEnd);
-      window.removeEventListener("wheel", handleWheel);
-    };
+      // Wheel event listener for desktop scroll control
+      gameArea.addEventListener("wheel", handleWheel, { passive: false });
+
+      return () => {
+        window.removeEventListener("keydown", handleKeyDown);
+        gameArea.removeEventListener("touchstart", handleTouchStart);
+        gameArea.removeEventListener("touchend", handleTouchEnd);
+        gameArea.removeEventListener("wheel", handleWheel);
+      };
+    }
   }, [handleKeyDown, handleTouchStart, handleTouchEnd, handleWheel]);
 
   return (
@@ -397,27 +403,29 @@ const MazeGame3D: React.FC = () => {
           mazeSize={mazeSize}
         />
       )}
-      <Canvas shadows className="absolute inset-0">
-        <ambientLight intensity={0.4} />
-        <spotLight
-          position={[10, 15, 10]}
-          angle={0.5}
-          penumbra={1}
-          castShadow
-        />
-        <MazeRenderer
-          maze={maze}
-          playerPosition={playerPosition}
-          finishPosition={finishPosition}
-          gameWon={gameWon}
-          mazeSize={mazeSize}
-        />
-        <CameraController
-          target={new THREE.Vector3(playerPosition.x, 0, playerPosition.z)}
-          resetCamera={resetCamera}
-          setResetCamera={setResetCamera}
-        />
-      </Canvas>
+      <div ref={gameAreaRef} className="game-area w-full h-full">
+        <Canvas shadows className="absolute inset-0">
+          <ambientLight intensity={0.4} />
+          <spotLight
+            position={[10, 15, 10]}
+            angle={0.5}
+            penumbra={1}
+            castShadow
+          />
+          <MazeRenderer
+            maze={maze}
+            playerPosition={playerPosition}
+            finishPosition={finishPosition}
+            gameWon={gameWon}
+            mazeSize={mazeSize}
+          />
+          <CameraController
+            target={new THREE.Vector3(playerPosition.x, 0, playerPosition.z)}
+            resetCamera={resetCamera}
+            setResetCamera={setResetCamera}
+          />
+        </Canvas>
+      </div>
       <BottomNav />
     </div>
   );
