@@ -1,6 +1,6 @@
 import { Howl } from "howler";
 
-let isGlobalMuted = false;
+let isGlobalMuted = true;
 let sounds: { [key: string]: Howl } | null = null; // Lazy initialization of sounds
 
 // Initialize sounds only after a user gesture

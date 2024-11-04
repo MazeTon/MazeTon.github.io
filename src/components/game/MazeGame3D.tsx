@@ -6,6 +6,7 @@ import Header from "@/components/game/Header";
 import Loading from "@/components/game/Loading";
 import MazeRenderer from "@/components/game/MazeRenderer";
 import MiniMap from "@/components/game/MiniMap";
+import SwipeHint from "@/components/game/SwipeHint";
 import {
   initializeSounds,
   isMuted,
@@ -386,8 +387,9 @@ const MazeGame3D: React.FC = () => {
   }, [handleKeyDown, handleTouchStart, handleTouchEnd, handleWheel]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen w-screen overflow-hidden bg-gradient-to-br from-black via-gray-900 to-gray-800 text-white">
+    <div className="flex flex-col items-center justify-center h-screen w-screen overflow-hidden text-white relative z-20">
       {loading && <Loading />}
+      <SwipeHint isFirstGame={mazeSize.width === 2 && mazeSize.height === 2} />
       <Header
         score={score}
         showMiniMap={showMiniMap}

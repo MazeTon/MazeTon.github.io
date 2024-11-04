@@ -6,11 +6,13 @@ import * as THREE from "three";
 interface WinningAnimationProps {
   position: THREE.Vector3;
   score: number;
+  gameWon: boolean;
 }
 
 const WinningAnimation: React.FC<WinningAnimationProps> = ({
   position,
   score,
+  gameWon,
 }) => {
   const animationRef = useRef<THREE.Mesh>(null);
 
@@ -26,7 +28,7 @@ const WinningAnimation: React.FC<WinningAnimationProps> = ({
     <Text
       ref={animationRef}
       position={position}
-      color="cyan"
+      color="#38e624"
       font="/font/RubikMaze-Regular.ttf"
       fontSize={0.8}
       maxWidth={200}
@@ -35,8 +37,9 @@ const WinningAnimation: React.FC<WinningAnimationProps> = ({
       textAlign="center"
       anchorX="center"
       anchorY="middle"
+      visible={gameWon}
     >
-      Yahoo! +{score}
+      +{score}
     </Text>
   );
 };

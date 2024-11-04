@@ -13,13 +13,13 @@ const Wall: React.FC<WallProps & MeshProps> = ({
   color,
 }) => (
   <mesh position={position} rotation={rotation} castShadow>
-    <boxGeometry args={[1, 1.5, 0.1]} />
+    <boxGeometry args={[1, 1.3, 0.1]} />
     <meshStandardMaterial
       color={color}
       transparent
       opacity={0.5}
-      roughness={0.3}
-      metalness={0.1}
+      roughness={1}
+      metalness={0}
     />
   </mesh>
 );

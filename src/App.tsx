@@ -1,7 +1,13 @@
 "use client";
 
+import BgGradient from "@/components/game/BgGradient";
 import MazeGame3D from "@/components/game/MazeGame3D";
 
 export default function App() {
-  return <MazeGame3D></MazeGame3D>;
+  return (
+    <>
+      <BgGradient />
+      <MazeGame3D />
+    </>
+  );
 }

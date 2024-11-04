@@ -64,8 +64,61 @@
     @apply bg-background text-foreground;
   }
   html {
-    font-family: "Rubik Maze", system-ui, sans-serif;
+    font-family: "Rubik Maze", "Tektur", system-ui, sans-serif;
     font-weight: 400;
     font-style: normal;
+  }
+}
+
+.swipe-hint {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: white;
+  font-size: 26px;
+  animation: fadeOut 160s ease forwards;
+  animation-delay: 3s;
+  pointer-events: none;
+}
+
+.swipe-icon {
+  font-size: 60px;
+  animation: swipeAnim 1.5s ease-in-out infinite;
+}
+
+@keyframes swipeAnim {
+  0%,
+  100% {
+    transform: translateX(20px);
+  }
+  25% {
+    transform: translateX(-20px);
+  }
+  37.5% {
+    transform: translateX(0px);
+  }
+  50% {
+    transform: translateY(-40px);
+  }
+  62.5% {
+    transform: translateY(0px);
+  }
+  75% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    display: none;
   }
 }
