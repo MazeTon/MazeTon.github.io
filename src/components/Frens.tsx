@@ -87,12 +87,13 @@ const Frens: React.FC<FrensProps> = ({ userId, initData }) => {
           {referrals.map((referral) => (
             <li
               key={referral.userId}
-              className="flex items-center space-x-2 bg-gray-800 p-2 rounded mb-2"
+              className="flex items-center space-x-2 bg-gray-800/50 p-2 rounded mb-2"
             >
               <FaUserPlus className="text-xl" />
               <span className="text-sm">
                 {referral.firstName} {referral.lastName}{" "}
                 {referral.username && `(@${referral.username})`}
+                ID {referral.userId}
               </span>
             </li>
           ))}
