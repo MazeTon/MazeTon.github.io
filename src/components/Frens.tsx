@@ -55,7 +55,7 @@ const Frens: React.FC<FrensProps> = ({ userId, initData }) => {
     fetchReferrals();
   }, [fetchReferrals]);
 
-  const referralLink = `https://t.me/MazeTonBot/app?startapp=ref-${userId}`;
+  const referralLink = `https://t.me/MazeTonBot/app?startapp=id${userId}`;
 
   return (
     <div className="flex flex-col items-center justify-start h-full w-full text-white p-4 mt-20">

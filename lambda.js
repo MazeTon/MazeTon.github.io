@@ -397,8 +397,8 @@ async function handleGetRequest(userId, userData, startParam) {
   // If user doesn't exist, create one
   if (!user) {
     let inviterId = null;
-    if (startParam && startParam.startsWith("ref-")) {
-      inviterId = startParam.substring(4);
+    if (startParam && startParam.startsWith("id")) {
+      inviterId = startParam.substring(2);
     }
     await createUser(userData, inviterId);
     user = await getUser(userId);
