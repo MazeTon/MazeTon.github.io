@@ -1,29 +1,18 @@
-import WebApp from "@twa-dev/sdk";
+import { HeaderProps } from "@/types/game";
 import React from "react";
 import { LiaVolumeOffSolid, LiaVolumeUpSolid } from "react-icons/lia";
-import { RiTreasureMapFill, RiTreasureMapLine } from "react-icons/ri";
-
-interface HeaderProps {
-  score: number;
-  showMiniMap: boolean;
-  isSoundMuted: boolean;
-  toggleMiniMap: () => void;
-  handleMuteToggle: () => void;
-}
+import { TbBadge3D, TbBadge3DFilled } from "react-icons/tb";
 
 const Header: React.FC<HeaderProps> = ({
   score,
-  showMiniMap,
+  showSimpleMap,
   isSoundMuted,
-  toggleMiniMap,
+  toggleSimpleMap,
   handleMuteToggle,
 }) => {
   return (
     <header className="absolute top-0 p-2 w-full flex items-center justify-center z-10">
-      <div
-        className="absolute left-2 flex items-center"
-        onClick={() => WebApp.showAlert(`MazeTon!`)}
-      >
+      <div className="absolute left-2 flex items-center">
         <img src={`logo.svg`} className="opacity-80 h-16 w-auto" alt="Logo" />
       </div>
 
@@ -47,14 +36,14 @@ const Header: React.FC<HeaderProps> = ({
         </button>
 
         <button
-          onClick={toggleMiniMap}
+          onClick={toggleSimpleMap}
           className="flex items-center text-white/20 hover:text-white/50 p-2 transition focus:outline-none"
         >
           <span>
-            {showMiniMap ? (
-              <RiTreasureMapFill className="h-10 w-12" />
+            {showSimpleMap ? (
+              <TbBadge3D className="h-10 w-12" />
             ) : (
-              <RiTreasureMapLine className="h-10 w-12" />
+              <TbBadge3DFilled className="h-10 w-12" />
             )}
           </span>
         </button>

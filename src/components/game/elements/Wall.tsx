@@ -1,11 +1,6 @@
+import { WallProps } from "@/types/game";
 import { MeshProps } from "@react-three/fiber";
 import React from "react";
-
-interface WallProps {
-  position: [number, number, number];
-  rotation?: [number, number, number];
-  color: string;
-}
 
 const Wall: React.FC<WallProps & MeshProps> = ({
   position,

@@ -1,13 +1,8 @@
+import { WinningAnimationProps } from "@/types/game";
 import { Text } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import React, { useRef } from "react";
 import * as THREE from "three";
-
-interface WinningAnimationProps {
-  position: THREE.Vector3;
-  score: number;
-  gameWon: boolean;
-}
 
 const WinningAnimation: React.FC<WinningAnimationProps> = ({
   position,

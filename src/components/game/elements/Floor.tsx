@@ -1,10 +1,5 @@
+import { FloorProps } from "@/types/game";
 import React from "react";
-
-interface FloorProps {
-  width: number;
-  height: number;
-  color: string;
-}
 
 const Floor: React.FC<FloorProps> = ({ width, height, color }) => (
   <mesh

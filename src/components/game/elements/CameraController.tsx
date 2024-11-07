@@ -1,11 +1,5 @@
+import { CameraControllerProps } from "@/types/game";
 import { useFrame, useThree } from "@react-three/fiber";
-import * as THREE from "three";
-
-interface CameraControllerProps {
-  target: THREE.Vector3;
-  resetCamera: boolean;
-  setResetCamera: React.Dispatch<React.SetStateAction<boolean>>;
-}
 
 const CameraController: React.FC<CameraControllerProps> = ({
   target,
@@ -16,7 +10,7 @@ const CameraController: React.FC<CameraControllerProps> = ({
 
   useFrame(() => {
     // Directly set the camera position without interpolation
-    camera.position.set(target.x, 5, target.z + 5);
+    camera.position.set(target.x - 0.5, 5, target.z + 5);
     camera.lookAt(target);
 
     if (resetCamera) {

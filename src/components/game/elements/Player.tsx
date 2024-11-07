@@ -1,12 +1,7 @@
+import { PlayerProps } from "@/types/game";
 import { useFrame } from "@react-three/fiber";
 import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-
-interface PlayerProps {
-  position: THREE.Vector3;
-  isWinning: boolean;
-  color: string;
-}
 
 const Player: React.FC<PlayerProps> = ({ position, isWinning, color }) => {
   const meshRef = useRef<THREE.Mesh>(null);

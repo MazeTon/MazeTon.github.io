@@ -1,12 +1,13 @@
 "use client";
 
-import BottomNav from "@/components/game/BottomNav";
-import CameraController from "@/components/game/CameraController";
-import Header from "@/components/game/Header";
-import Loading from "@/components/game/Loading";
-import MazeRenderer from "@/components/game/MazeRenderer";
-import MiniMap from "@/components/game/MiniMap";
-import SwipeHint from "@/components/game/SwipeHint";
+import BgGradient from "@/components/game/elements/BgGradient";
+import BottomNav from "@/components/game/elements/BottomNav";
+import CameraController from "@/components/game/elements/CameraController";
+import Header from "@/components/game/elements/Header";
+import Loading from "@/components/game/elements/Loading";
+import Maze from "@/components/game/elements/Maze";
+import MiniMap from "@/components/game/elements/SimpleMap";
+import SwipeHint from "@/components/game/elements/SwipeHint";
 import {
   initializeSounds,
   isMuted,
@@ -14,38 +15,28 @@ import {
   setSoundsMute,
   toggleGlobalMute,
 } from "@/lib/soundEffects";
+import { Cell } from "@/types/game";
 import { Canvas } from "@react-three/fiber";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
-type Cell = {
-  x: number;
-  y: number;
-  walls: {
-    top: boolean;
-    right: boolean;
-    bottom: boolean;
-    left: boolean;
-  };
-};
-
 export const MAX_SIZE = 1000;
 
-const MazeGame3D: React.FC = () => {
+const Game: React.FC = () => {
   const [maze, setMaze] = useState<Cell[][]>([]);
   const [playerPosition, setPlayerPosition] = useState(
     new THREE.Vector3(0, 0, 0)
   );
   const [finishPosition, setFinishPosition] = useState({ x: 1, y: 1 });
-  const [mazeSize, setMazeSize] = useState({ width: 2, height: 2 });
+  const [mazeSize, setMazeSize] = useState({ width: 4, height: 4 });
   const [gameWon, setGameWon] = useState(false);
   const [resetCamera, setResetCamera] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [showMiniMap, setShowMiniMap] = useState(false);
+  const [showSimpleMap, setShowSimpleMap] = useState(false);
   const [score, setScore] = useState(0);
   const [isSoundMuted, setIsSoundMuted] = useState(isMuted());
 
-  const toggleMiniMap = () => setShowMiniMap((prev) => !prev);
+  const toggleSimpleMap = () => setShowSimpleMap((prev) => !prev);
 
   const handleMuteToggle = () => {
     toggleGlobalMute();
@@ -131,8 +122,8 @@ const MazeGame3D: React.FC = () => {
         [x - 1, y, "left", "right"],
       ].filter(
         ([nx, ny]) =>
-          typeof nx === "number" &&
-          typeof ny === "number" &&
+          typeof nx === "number" && // without this condition there will be a typescript error
+          typeof ny === "number" && // without this condition there will be a typescript error
           nx >= 0 &&
           nx < mazeSize.width &&
           ny >= 0 &&
@@ -386,51 +377,84 @@ const MazeGame3D: React.FC = () => {
     }
   }, [handleKeyDown, handleTouchStart, handleTouchEnd, handleWheel]);
 
+  const getRandomColor = useCallback((plus: number): string => {
+    const getRandomValue = () => Math.floor(Math.random() * 128) + plus;
+    const r = getRandomValue();
+    const g = getRandomValue();
+    const b = getRandomValue();
+
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+  }, []);
+
+  const wallColor = useRef(getRandomColor(128));
+  const floorColor = useRef(getRandomColor(128));
+  const playerColor = useRef(getRandomColor(64));
+  const portalColor = useRef(getRandomColor(64));
+
+  useEffect(() => {
+    if (gameWon) {
+      wallColor.current = getRandomColor(128);
+      floorColor.current = getRandomColor(128);
+      playerColor.current = getRandomColor(64);
+      portalColor.current = getRandomColor(64);
+    }
+  }, [gameWon, getRandomColor]);
+
   return (
-    <div className="flex flex-col items-center justify-center h-screen w-screen overflow-hidden text-white relative z-20">
+    <div className="flex flex-col items-center justify-center h-screen w-screen overflow-hidden text-white relative">
       {loading && <Loading />}
+      <BgGradient />
       <SwipeHint isFirstGame={mazeSize.width === 2 && mazeSize.height === 2} />
       <Header
         score={score}
-        showMiniMap={showMiniMap}
+        showSimpleMap={showSimpleMap}
         isSoundMuted={isSoundMuted}
-        toggleMiniMap={toggleMiniMap}
+        toggleSimpleMap={toggleSimpleMap}
         handleMuteToggle={handleMuteToggle}
       />
-      {showMiniMap && (
-        <MiniMap
-          maze={maze}
-          playerPosition={playerPosition}
-          finishPosition={finishPosition}
-          mazeSize={mazeSize}
-        />
-      )}
       <div ref={gameAreaRef} className="game-area w-full h-full">
-        <Canvas shadows className="absolute inset-0">
-          <ambientLight intensity={0.4} />
-          <spotLight
-            position={[10, 15, 10]}
-            angle={0.5}
-            penumbra={1}
-            castShadow
-          />
-          <MazeRenderer
+        {showSimpleMap ? (
+          <MiniMap
             maze={maze}
             playerPosition={playerPosition}
             finishPosition={finishPosition}
-            gameWon={gameWon}
             mazeSize={mazeSize}
+            wallColor={wallColor.current}
+            floorColor={floorColor.current}
+            playerColor={playerColor.current}
+            portalColor={portalColor.current}
           />
-          <CameraController
-            target={new THREE.Vector3(playerPosition.x, 0, playerPosition.z)}
-            resetCamera={resetCamera}
-            setResetCamera={setResetCamera}
-          />
-        </Canvas>
+        ) : (
+          <Canvas shadows className="absolute inset-0">
+            <ambientLight intensity={0.4} />
+            <spotLight
+              position={[10, 15, 10]}
+              angle={0.5}
+              penumbra={1}
+              castShadow
+            />
+            <Maze
+              maze={maze}
+              playerPosition={playerPosition}
+              finishPosition={finishPosition}
+              gameWon={gameWon}
+              mazeSize={mazeSize}
+              wallColor={wallColor.current}
+              floorColor={floorColor.current}
+              playerColor={playerColor.current}
+              portalColor={portalColor.current}
+            />
+            <CameraController
+              target={new THREE.Vector3(playerPosition.x, 0, playerPosition.z)}
+              resetCamera={resetCamera}
+              setResetCamera={setResetCamera}
+            />
+          </Canvas>
+        )}
       </div>
       <BottomNav />
     </div>
   );
 };
 
-export default MazeGame3D;
+export default Game;

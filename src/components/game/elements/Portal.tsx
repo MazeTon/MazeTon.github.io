@@ -1,12 +1,7 @@
+import { PortalProps } from "@/types/game";
 import { useFrame } from "@react-three/fiber";
 import React, { useRef } from "react";
 import * as THREE from "three";
-
-interface PortalProps {
-  position: THREE.Vector3;
-  isWinning: boolean;
-  color: string;
-}
 
 const Portal: React.FC<PortalProps> = ({ position, isWinning, color }) => {
   const portalRef = useRef<THREE.Mesh>(null);
