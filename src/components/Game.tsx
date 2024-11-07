@@ -74,46 +74,61 @@ const Game: React.FC = () => {
   const getStoredPosition = async (
     mazeId: string
   ): Promise<{ x: number; y: number } | null> => {
-    // Try to get from CloudStorage
-    if (window.Telegram?.WebApp?.CloudStorage) {
-      return new Promise((resolve) => {
-        window.Telegram?.WebApp?.CloudStorage.getItem(
-          mazeId,
-          (error, value) => {
-            if (error) {
-              console.error("Error getting position from CloudStorage:", error);
-              resolve(null);
-            } else if (value) {
-              try {
-                const position = JSON.parse(value);
-                resolve(position);
-              } catch (e) {
-                console.error("Error parsing position from CloudStorage:", e);
-                resolve(null);
-              }
-            } else {
+    // Define a timeout for the CloudStorage retrieval
+    const cloudStoragePromise = new Promise<{ x: number; y: number } | null>(
+      (resolve) => {
+        if (!window.Telegram?.WebApp?.CloudStorage) {
+          resolve(null);
+          return;
+        }
+
+        let resolved = false;
+        const timeoutId = setTimeout(() => {
+          if (!resolved) {
+            console.warn("CloudStorage.getItem timed out.");
+            resolve(null);
+          }
+        }, 5000); // Timeout after 5 seconds
+
+        window.Telegram.WebApp.CloudStorage.getItem(mazeId, (error, value) => {
+          if (resolved) return;
+          resolved = true;
+          clearTimeout(timeoutId);
+
+          if (error) {
+            console.error("Error getting position from CloudStorage:", error);
+            resolve(null);
+          } else if (value) {
+            try {
+              resolve(JSON.parse(value) as { x: number; y: number });
+            } catch (e) {
+              console.error("Error parsing position from CloudStorage:", e);
               resolve(null);
             }
+          } else {
+            resolve(null);
           }
-        );
-      });
-    }
+        });
+      }
+    );
 
-    // If no value from CloudStorage, try localStorage
-    if (window.localStorage) {
-      const value = window.localStorage.getItem(mazeId);
-      if (value) {
-        try {
-          const position = JSON.parse(value);
-          return position;
-        } catch (e) {
-          console.error("Error parsing position from localStorage:", e);
-          return null;
+    // Fallback to localStorage
+    const localStorageFallback = (): { x: number; y: number } | null => {
+      if (window.localStorage) {
+        const value = window.localStorage.getItem(mazeId);
+        if (value) {
+          try {
+            return JSON.parse(value) as { x: number; y: number };
+          } catch (e) {
+            console.error("Error parsing position from localStorage:", e);
+          }
         }
       }
-    }
+      return null;
+    };
 
-    return null;
+    // Wait for CloudStorage, then fallback if necessary
+    return (await cloudStoragePromise) || localStorageFallback();
   };
 
   const savePosition = (mazeId: string, position: { x: number; y: number }) => {
@@ -213,20 +228,13 @@ const Game: React.FC = () => {
       setUserData(data.userData);
       setUserId(data.userData.userId);
 
+      console.log("Get stored position");
       // Get stored position
       const storedPosition = await getStoredPosition(data.mazeId);
 
       if (storedPosition) {
         setPlayerPosition(
           new THREE.Vector3(storedPosition.x, 0, storedPosition.y)
-        );
-      } else {
-        setPlayerPosition(
-          new THREE.Vector3(
-            data.playerPosition?.x || 0,
-            0,
-            data.playerPosition?.y || data.mazeSize.height - 1
-          )
         );
       }
     } catch (error) {
@@ -611,7 +619,6 @@ const Game: React.FC = () => {
       <div className="w-full h-full z-10">
         {currentView === "play" && (
           <div ref={gameAreaRef} className="game-area w-full h-full z-10">
-            (
             {showSimpleMap ? (
               <MiniMap
                 maze={maze}
@@ -624,11 +631,7 @@ const Game: React.FC = () => {
                 portalColor={colorScheme.portalColor}
               />
             ) : !loading && maze && maze.length > 0 && mazeId ? (
-              <Canvas
-                key={`maze-canvas-${mazeId}`}
-                shadows
-                className="absolute inset-0"
-              >
+              <Canvas shadows className="absolute inset-0">
                 <ambientLight intensity={0.4} />
                 <spotLight
                   position={[10, 15, 10]}
@@ -637,7 +640,6 @@ const Game: React.FC = () => {
                   castShadow
                 />
                 <Maze
-                  key={`maze-${mazeId}`}
                   maze={maze}
                   playerPosition={playerPosition}
                   finishPosition={finishPosition}
@@ -657,7 +659,6 @@ const Game: React.FC = () => {
                 />
               </Canvas>
             ) : null}
-            )
           </div>
         )}
         {currentView === "items" && <Items items={userData.items || []} />}

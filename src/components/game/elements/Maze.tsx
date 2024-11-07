@@ -3,7 +3,7 @@ import Player from "@/components/game/elements/Player";
 import Portal from "@/components/game/elements/Portal";
 import WinningAnimation from "@/components/game/elements/WinningAnimation";
 import { MazeProps } from "@/types/game";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 
 const Maze: React.FC<MazeProps> = ({
@@ -17,6 +17,27 @@ const Maze: React.FC<MazeProps> = ({
   playerColor,
   portalColor,
 }) => {
+  const mazeGroupRef = useRef<THREE.Group>(null);
+
+  // Dispose of resources when the component unmounts
+  useEffect(() => {
+    const mazeGroup = mazeGroupRef.current;
+
+    return () => {
+      if (mazeGroup) {
+        mazeGroup.traverse((object) => {
+          if (object instanceof THREE.Mesh) {
+            // Dispose of geometry
+            if (object.geometry) {
+              object.geometry.dispose();
+            }
+            // Do NOT dispose of materials here
+          }
+        });
+      }
+    };
+  }, []);
+
   // Configure wall material with transparency
   const wallMaterial = useMemo(
     () =>
@@ -29,6 +50,7 @@ const Maze: React.FC<MazeProps> = ({
       }),
     [wallColor]
   );
+
   const wallGeometry = useMemo(() => new THREE.BoxGeometry(1, 1.3, 0.1), []);
 
   // Calculate the number of wall instances required
@@ -98,7 +120,7 @@ const Maze: React.FC<MazeProps> = ({
   if (!maze || maze.length === 0) return null;
 
   return (
-    <group>
+    <group ref={mazeGroupRef}>
       <Floor width={maze[0].length} height={maze.length} color={floorColor} />
       <primitive object={walls} />
       <Player
