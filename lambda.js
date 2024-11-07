@@ -483,6 +483,15 @@ async function handleGetRequest(userId, userData, startParam) {
       playerPosition: maze.playerPosition,
       item: maze.item,
       score: user.score || 0,
+      userData: {
+        userId: user.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+        photoUrl: user.photoUrl,
+        tonAddress: user.tonAddress,
+        items: user.items || [],
+      },
     }),
   };
 }
@@ -551,7 +560,7 @@ async function handlePickupRequest(userId) {
   if (!maze || maze.passed) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: "Maze By Id not found" }),
+      body: JSON.stringify({ error: "Maze not found" }),
     };
   }
 
@@ -560,6 +569,14 @@ async function handlePickupRequest(userId) {
     if (x === maze.item.x && y === maze.item.y) {
       maze.item.picked = true;
       await saveMaze(maze);
+
+      // Update user's items
+      const userItems = user.items || [];
+      userItems.push(maze.item.type);
+
+      // Update user data
+      await updateUser(userId, { items: userItems });
+
       return {
         statusCode: 200,
         body: JSON.stringify({ message: "Item picked", item: maze.item }),

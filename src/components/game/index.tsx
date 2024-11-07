@@ -452,7 +452,7 @@ const Game: React.FC = () => {
           </Canvas>
         )}
       </div>
-      <BottomNav />
+      <BottomNav currentView={`play`} setCurrentView={() => {}} />
     </div>
   );
 };

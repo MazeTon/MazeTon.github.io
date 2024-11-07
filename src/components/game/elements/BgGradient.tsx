@@ -16,7 +16,7 @@ const BgGradient = () => {
 
   return (
     <div
-      className="fixed inset-0 pointer-events-none"
+      className="fixed inset-0 pointer-events-none z-0"
       style={{
         background: gradient.current,
       }}

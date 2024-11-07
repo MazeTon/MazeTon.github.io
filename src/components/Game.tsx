@@ -1,5 +1,6 @@
 "use client";
 
+import Frens from "@/components/Frens";
 import BgGradient from "@/components/game/elements/BgGradient";
 import BottomNav from "@/components/game/elements/BottomNav";
 import CameraController from "@/components/game/elements/CameraController";
@@ -8,6 +9,8 @@ import Loading from "@/components/game/elements/Loading";
 import Maze from "@/components/game/elements/Maze";
 import MiniMap from "@/components/game/elements/SimpleMap";
 import SwipeHint from "@/components/game/elements/SwipeHint";
+import Items from "@/components/Items";
+import Profile from "@/components/Profile";
 import {
   initializeSounds,
   isMuted,
@@ -48,6 +51,10 @@ const Game: React.FC = () => {
     picked: boolean;
   } | null>(null); // For items in the maze
   const [penaltyTime, setPenaltyTime] = useState<number | null>(null);
+  const [currentView, setCurrentView] = useState("play");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [userData, setUserData] = useState<any>({});
+  const [userId, setUserId] = useState<string>("");
 
   const mazeCompletionSent = useRef(false);
 
@@ -64,8 +71,85 @@ const Game: React.FC = () => {
     setIsSoundMuted(isMuted());
   };
 
+  const getStoredPosition = async (
+    mazeId: string
+  ): Promise<{ x: number; y: number } | null> => {
+    // Try to get from CloudStorage
+    if (window.Telegram?.WebApp?.CloudStorage) {
+      return new Promise((resolve) => {
+        window.Telegram?.WebApp?.CloudStorage.getItem(
+          mazeId,
+          (error, value) => {
+            if (error) {
+              console.error("Error getting position from CloudStorage:", error);
+              resolve(null);
+            } else if (value) {
+              try {
+                const position = JSON.parse(value);
+                resolve(position);
+              } catch (e) {
+                console.error("Error parsing position from CloudStorage:", e);
+                resolve(null);
+              }
+            } else {
+              resolve(null);
+            }
+          }
+        );
+      });
+    }
+
+    // If no value from CloudStorage, try localStorage
+    if (window.localStorage) {
+      const value = window.localStorage.getItem(mazeId);
+      if (value) {
+        try {
+          const position = JSON.parse(value);
+          return position;
+        } catch (e) {
+          console.error("Error parsing position from localStorage:", e);
+          return null;
+        }
+      }
+    }
+
+    return null;
+  };
+
+  const savePosition = (mazeId: string, position: { x: number; y: number }) => {
+    if (window.Telegram?.WebApp?.CloudStorage) {
+      window.Telegram?.WebApp?.CloudStorage.setItem(
+        mazeId,
+        JSON.stringify(position),
+        (error) => {
+          if (error) {
+            console.error("Error saving to CloudStorage:", error);
+          }
+        }
+      );
+    }
+
+    if (window.localStorage) {
+      window.localStorage.setItem(mazeId, JSON.stringify(position));
+    }
+  };
+
+  const clearStoredPosition = (mazeId: string) => {
+    if (window.Telegram?.WebApp?.CloudStorage) {
+      window.Telegram?.WebApp?.CloudStorage.removeItem(mazeId, (error) => {
+        if (error) {
+          console.error("Error clearing CloudStorage:", error);
+        }
+      });
+    }
+    if (window.localStorage) {
+      window.localStorage.removeItem(mazeId);
+    }
+  };
+
   const fetchMazeData = useCallback(async () => {
     setLoading(true);
+    console.log("fetchMazeData started");
     initializeSounds();
 
     try {
@@ -125,34 +209,31 @@ const Game: React.FC = () => {
       setGameWon(false);
       setResetCamera(true);
 
-      // Retrieve position from CloudStorage if available
-      if (window.Telegram?.WebApp?.CloudStorage) {
-        window.Telegram?.WebApp?.CloudStorage.getItem(
-          data.mazeId,
-          (error, value) => {
-            console.log("playerPosition", data.mazeId, error, value);
-            if (!error && value) {
-              const storedPosition = JSON.parse(value);
-              setPlayerPosition(
-                new THREE.Vector3(storedPosition.x, 0, storedPosition.y)
-              );
-            }
-          }
-        );
-      }
+      // Extract userData and userId
+      setUserData(data.userData);
+      setUserId(data.userData.userId);
 
-      if (window.localStorage && window.localStorage.getItem(data.mazeId)) {
-        const storedPosition = JSON.parse(
-          window.localStorage.getItem(data.mazeId) || ""
-        );
+      // Get stored position
+      const storedPosition = await getStoredPosition(data.mazeId);
+
+      if (storedPosition) {
         setPlayerPosition(
           new THREE.Vector3(storedPosition.x, 0, storedPosition.y)
         );
+      } else {
+        setPlayerPosition(
+          new THREE.Vector3(
+            data.playerPosition?.x || 0,
+            0,
+            data.playerPosition?.y || data.mazeSize.height - 1
+          )
+        );
       }
     } catch (error) {
-      console.error(error);
+      console.error("fetchMazeData error:", error);
     } finally {
       setLoading(false);
+      console.log("fetchMazeData completed");
     }
   }, []);
 
@@ -165,24 +246,10 @@ const Game: React.FC = () => {
   useEffect(() => {
     if (playerPosition.x === 0 && playerPosition.z === mazeSize.height - 1)
       return;
-    if (window.Telegram?.WebApp?.CloudStorage) {
-      const position = { x: playerPosition.x, y: playerPosition.z };
-      console.log("Save position", mazeId, position);
-      window.Telegram?.WebApp?.CloudStorage.setItem(
-        mazeId,
-        JSON.stringify(position),
-        (error) => {
-          if (error) {
-            console.error("Error saving to CloudStorage:", error);
-          }
-        }
-      );
-    }
 
-    if (window.localStorage) {
-      const position = { x: playerPosition.x, y: playerPosition.z };
-      window.localStorage.setItem(mazeId, JSON.stringify(position));
-    }
+    const position = { x: playerPosition.x, y: playerPosition.z };
+    console.log("Save position", mazeId, position);
+    savePosition(mazeId, position);
   }, [playerPosition, mazeId, mazeSize.height]);
 
   const sendPositionToServer = useCallback(async () => {
@@ -237,19 +304,12 @@ const Game: React.FC = () => {
   }, [playerPosition.x, playerPosition.z]);
 
   const clearCloudStorage = useCallback(() => {
-    if (window.Telegram?.WebApp?.CloudStorage) {
-      window.Telegram?.WebApp?.CloudStorage.removeItem(mazeId, (error) => {
-        if (error) {
-          console.error("Error clearing CloudStorage:", error);
-        }
-      });
-    }
-    if (window.localStorage) {
-      window.localStorage.removeItem(mazeId);
-    }
+    clearStoredPosition(mazeId);
   }, [mazeId]);
 
   const sendMazeCompletion = useCallback(async () => {
+    console.log("sendMazeCompletion started");
+
     try {
       const response = await fetch(
         "https://d2xcq5opb5.execute-api.us-east-1.amazonaws.com/user",
@@ -273,21 +333,26 @@ const Game: React.FC = () => {
         // Handle the error appropriately, e.g., show a message to the user
         return;
       }
-      // Fetch new maze data after completion
+
+      // Set loading to true before fetching new maze data
       setLoading(true);
-      // Clear CloudStorage for the new maze
-      clearCloudStorage();
+
+      // Clear stored position
+      clearStoredPosition(mazeId);
+
       // Reset states
       setGameWon(false);
       setItem(null);
+
       // Fetch new maze
       await fetchMazeData();
     } catch (error) {
       console.error("Error sending maze completion to server:", error);
     } finally {
       mazeCompletionSent.current = false; // Reset the flag after completion
+      console.log("sendMazeCompletion completed");
     }
-  }, [clearCloudStorage, fetchMazeData, playerPosition.x, playerPosition.z]);
+  }, [fetchMazeData, mazeId, playerPosition.x, playerPosition.z]);
 
   const movePlayer = useCallback(
     (dx: number, dy: number) => {
@@ -502,7 +567,7 @@ const Game: React.FC = () => {
         gameArea.removeEventListener("wheel", handleWheel);
       };
     }
-  }, [handleTouchStart, handleTouchEnd, handleWheel]);
+  }, [handleTouchStart, handleTouchEnd, handleWheel, currentView]);
 
   // Handle penalty time display
   useEffect(() => {
@@ -543,48 +608,67 @@ const Game: React.FC = () => {
         toggleSimpleMap={toggleSimpleMap}
         handleMuteToggle={handleMuteToggle}
       />
-      <div ref={gameAreaRef} className="game-area w-full h-full">
-        {showSimpleMap ? (
-          <MiniMap
-            maze={maze}
-            playerPosition={playerPosition}
-            finishPosition={finishPosition}
-            mazeSize={mazeSize}
-            wallColor={colorScheme.wallColor}
-            floorColor={colorScheme.floorColor}
-            playerColor={colorScheme.playerColor}
-            portalColor={colorScheme.portalColor}
-          />
-        ) : !loading && maze && maze.length > 0 ? (
-          <Canvas key={mazeId} shadows className="absolute inset-0">
-            <ambientLight intensity={0.4} />
-            <spotLight
-              position={[10, 15, 10]}
-              angle={0.5}
-              penumbra={1}
-              castShadow
-            />
-            <Maze
-              key={mazeId}
-              maze={maze}
-              playerPosition={playerPosition}
-              finishPosition={finishPosition}
-              gameWon={gameWon}
-              mazeSize={mazeSize}
-              wallColor={colorScheme.wallColor}
-              floorColor={colorScheme.floorColor}
-              playerColor={colorScheme.playerColor}
-              portalColor={colorScheme.portalColor}
-            />
-            <CameraController
-              target={new THREE.Vector3(playerPosition.x, 0, playerPosition.z)}
-              resetCamera={resetCamera}
-              setResetCamera={setResetCamera}
-            />
-          </Canvas>
-        ) : null}
+      <div className="w-full h-full z-10">
+        {currentView === "play" && (
+          <div ref={gameAreaRef} className="game-area w-full h-full z-10">
+            (
+            {showSimpleMap ? (
+              <MiniMap
+                maze={maze}
+                playerPosition={playerPosition}
+                finishPosition={finishPosition}
+                mazeSize={mazeSize}
+                wallColor={colorScheme.wallColor}
+                floorColor={colorScheme.floorColor}
+                playerColor={colorScheme.playerColor}
+                portalColor={colorScheme.portalColor}
+              />
+            ) : !loading && maze && maze.length > 0 && mazeId ? (
+              <Canvas
+                key={`maze-canvas-${mazeId}`}
+                shadows
+                className="absolute inset-0"
+              >
+                <ambientLight intensity={0.4} />
+                <spotLight
+                  position={[10, 15, 10]}
+                  angle={0.5}
+                  penumbra={1}
+                  castShadow
+                />
+                <Maze
+                  key={`maze-${mazeId}`}
+                  maze={maze}
+                  playerPosition={playerPosition}
+                  finishPosition={finishPosition}
+                  gameWon={gameWon}
+                  mazeSize={mazeSize}
+                  wallColor={colorScheme.wallColor}
+                  floorColor={colorScheme.floorColor}
+                  playerColor={colorScheme.playerColor}
+                  portalColor={colorScheme.portalColor}
+                />
+                <CameraController
+                  target={
+                    new THREE.Vector3(playerPosition.x, 0, playerPosition.z)
+                  }
+                  resetCamera={resetCamera}
+                  setResetCamera={setResetCamera}
+                />
+              </Canvas>
+            ) : null}
+            )
+          </div>
+        )}
+        {currentView === "items" && <Items items={userData.items || []} />}
+        {currentView === "frens" && (
+          <Frens userId={userId} initData={initData.current} />
+        )}
+        {currentView === "profile" && (
+          <Profile userData={userData} initData={initData.current} />
+        )}
       </div>
-      <BottomNav />
+      <BottomNav currentView={currentView} setCurrentView={setCurrentView} />
     </div>
   );
 };

@@ -11,7 +11,7 @@ const Header: React.FC<HeaderProps> = ({
   handleMuteToggle,
 }) => {
   return (
-    <header className="absolute top-0 p-2 w-full flex items-center justify-center z-10">
+    <header className="absolute top-0 p-2 w-full flex items-center justify-center z-20">
       <div className="absolute left-2 flex items-center">
         <img src={`logo.svg`} className="opacity-80 h-16 w-auto" alt="Logo" />
       </div>

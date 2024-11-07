@@ -16,6 +16,7 @@ export interface NavButtonProps {
   icon: ReactElement;
   text: string;
   color: string;
+  active: boolean;
 }
 
 export interface CameraControllerProps {
