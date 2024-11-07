@@ -608,7 +608,6 @@ const Game: React.FC = () => {
         </div>
       )}
       <BgGradient />
-      <SwipeHint isFirstGame={mazeSize.width === 1 || mazeSize.height === 1} />
       <Header
         score={score}
         showSimpleMap={showSimpleMap}
@@ -618,48 +617,53 @@ const Game: React.FC = () => {
       />
       <div className="w-full h-full z-10">
         {currentView === "play" && (
-          <div ref={gameAreaRef} className="game-area w-full h-full z-10">
-            {showSimpleMap ? (
-              <MiniMap
-                maze={maze}
-                playerPosition={playerPosition}
-                finishPosition={finishPosition}
-                mazeSize={mazeSize}
-                wallColor={colorScheme.wallColor}
-                floorColor={colorScheme.floorColor}
-                playerColor={colorScheme.playerColor}
-                portalColor={colorScheme.portalColor}
-              />
-            ) : !loading && maze && maze.length > 0 && mazeId ? (
-              <Canvas shadows className="absolute inset-0">
-                <ambientLight intensity={0.4} />
-                <spotLight
-                  position={[10, 15, 10]}
-                  angle={0.5}
-                  penumbra={1}
-                  castShadow
-                />
-                <Maze
+          <>
+            <SwipeHint
+              isFirstGame={mazeSize.width === 1 || mazeSize.height === 1}
+            />
+            <div ref={gameAreaRef} className="game-area w-full h-full z-10">
+              {showSimpleMap ? (
+                <MiniMap
                   maze={maze}
                   playerPosition={playerPosition}
                   finishPosition={finishPosition}
-                  gameWon={gameWon}
                   mazeSize={mazeSize}
                   wallColor={colorScheme.wallColor}
                   floorColor={colorScheme.floorColor}
                   playerColor={colorScheme.playerColor}
                   portalColor={colorScheme.portalColor}
                 />
-                <CameraController
-                  target={
-                    new THREE.Vector3(playerPosition.x, 0, playerPosition.z)
-                  }
-                  resetCamera={resetCamera}
-                  setResetCamera={setResetCamera}
-                />
-              </Canvas>
-            ) : null}
-          </div>
+              ) : !loading && maze && maze.length > 0 && mazeId ? (
+                <Canvas shadows className="absolute inset-0">
+                  <ambientLight intensity={0.4} />
+                  <spotLight
+                    position={[10, 15, 10]}
+                    angle={0.5}
+                    penumbra={1}
+                    castShadow
+                  />
+                  <Maze
+                    maze={maze}
+                    playerPosition={playerPosition}
+                    finishPosition={finishPosition}
+                    gameWon={gameWon}
+                    mazeSize={mazeSize}
+                    wallColor={colorScheme.wallColor}
+                    floorColor={colorScheme.floorColor}
+                    playerColor={colorScheme.playerColor}
+                    portalColor={colorScheme.portalColor}
+                  />
+                  <CameraController
+                    target={
+                      new THREE.Vector3(playerPosition.x, 0, playerPosition.z)
+                    }
+                    resetCamera={resetCamera}
+                    setResetCamera={setResetCamera}
+                  />
+                </Canvas>
+              ) : null}
+            </div>
+          </>
         )}
         {currentView === "items" && <Items items={userData.items || []} />}
         {currentView === "frens" && (
