@@ -1,4 +1,4 @@
-# MazeTon: A Telegram WebApp 3D Maze Adventure 🌀
+# MazeTon: A Telegram Mini App 3D Maze Adventure 🌀
 
 <div style="text-align:center" align="center">
     <img src="https://raw.githubusercontent.com/mazeton/mazeton.github.io/master/public/logo.png" width="400">
@@ -24,6 +24,10 @@ Embark on a journey through a world of vibrant mazes that evolve as you progress
 3. **Find the Exit**: Reach the glowing portal to complete the maze.
 4. **Collect Items**: Pick up items along the way for extra points.
 5. **Advance**: Each completed maze increases in size and difficulty.
+
+| Screenshot 1                                                                                         | Screenshot 2                                                                                         | Screenshot 3                                                                                         |
+| :--------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------- |
+| ![Screenshot 1](https://raw.githubusercontent.com/mazeton/mazeton.github.io/master/public/scr/1.jpg) | ![Screenshot 2](https://raw.githubusercontent.com/mazeton/mazeton.github.io/master/public/scr/2.jpg) | ![Screenshot 3](https://raw.githubusercontent.com/mazeton/mazeton.github.io/master/public/scr/3.jpg) |
 
 ## 🕹 Features
 
