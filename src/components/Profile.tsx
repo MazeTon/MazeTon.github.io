@@ -1,4 +1,3 @@
-import { convertToBase64Url } from "@/utils/addressUtils"; // Adjust the import path as needed
 import {
   ConnectedWallet,
   TonConnectButton,
@@ -39,7 +38,9 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
 
         const data = await response.json();
 
-        if (!response.ok) {
+        if (response.ok) {
+          window.Telegram.WebApp.showAlert("TON Address successfully saved!");
+        } else {
           console.error("Error saving address:", data.error);
           window.Telegram.WebApp.showAlert(`Error: ${data.error}`);
         }
@@ -54,10 +55,9 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
   useEffect(() => {
     const handleConnection = (status: ConnectedWallet | null) => {
       if (status?.account) {
-        const address = status.account.address; // Base64/standard address
-        const convertedAddress = convertToBase64Url(address); // Convert to Base64url
-        setTonAddress(convertedAddress);
-        saveAddressToDatabase(convertedAddress);
+        const address = status.account.address;
+        setTonAddress(address);
+        saveAddressToDatabase(address);
       } else {
         setTonAddress("");
       }
