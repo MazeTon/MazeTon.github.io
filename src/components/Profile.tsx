@@ -9,7 +9,6 @@ interface ProfileProps {
 }
 
 const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
-  const userFriendlyAddress = useTonAddress(); // Default true for user-friendly format
   const rawAddress = useTonAddress(false); // Get raw address
 
   const saveAddressToDatabase = useCallback(
@@ -52,10 +51,6 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
     }
   }, [rawAddress, saveAddressToDatabase]);
 
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-6)}`;
-  };
-
   return (
     <div className="flex flex-col items-center justify-start h-full w-full text-white p-4 mt-20">
       <h2 className="text-2xl font-bold mb-4 text-lime-500">Your Profile</h2>
@@ -73,16 +68,6 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
           {userData.firstName || `Anonymous`} {userData.lastName}
         </p>
         <p className="text-sm mb-4">@{userData.username || `anonymous`}</p>
-      </div>
-      <div className="w-full max-w-md text-center my-4">
-        <p className="block text-sm mb-1">TON Address:</p>
-        {userFriendlyAddress ? (
-          <p className="bg-gray-800 text-white p-2 rounded text-sm opacity-90 bg-teal-700/10 shadow-md">
-            {formatAddress(userFriendlyAddress)}
-          </p>
-        ) : (
-          <p className="text-gray-500">Not connected</p>
-        )}
       </div>
       <TonConnectButton />
     </div>
