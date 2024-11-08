@@ -18,8 +18,16 @@ const Player: React.FC<PlayerProps> = ({ position, isWinning, color }) => {
       setIsBouncing(true); // Start bouncing when position changes
       bounceStartTime.current = performance.now(); // Record the time the bounce starts
       previousPosition.current.copy(position); // Update previous position
+      resetShadow(); // Reset shadow when a new bounce starts
     }
   }, [position]);
+
+  const resetShadow = () => {
+    if (shadowRef.current) {
+      shadowRef.current.scale.set(1, 1, 1);
+      (shadowRef.current.material as THREE.MeshBasicMaterial).opacity = 0.5;
+    }
+  };
 
   useFrame(({ clock }) => {
     if (meshRef.current && shadowRef.current) {
@@ -75,6 +83,7 @@ const Player: React.FC<PlayerProps> = ({ position, isWinning, color }) => {
             shadowOpacity;
         } else {
           setShadowAnimating(false); // Stop shadow animation after 1 run
+          resetShadow(); // Ensure shadow resets completely
         }
       }
     }
