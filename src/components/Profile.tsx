@@ -38,9 +38,7 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
 
         const data = await response.json();
 
-        if (response.ok) {
-          window.Telegram.WebApp.showAlert("TON Address successfully saved!");
-        } else {
+        if (!response.ok) {
           console.error("Error saving address:", data.error);
           window.Telegram.WebApp.showAlert(`Error: ${data.error}`);
         }
