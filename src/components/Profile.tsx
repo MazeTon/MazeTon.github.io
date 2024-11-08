@@ -69,18 +69,7 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
         </p>
         <p className="text-sm mb-4">@{userData.username || `anonymous`}</p>
       </div>
-      <TonConnectButton
-        style={{
-          backgroundColor: "#B04CAD",
-          color: "white",
-          padding: "10px 20px",
-          borderRadius: "8px",
-          fontWeight: "bold",
-          fontSize: "14px",
-          border: "none",
-          cursor: "pointer",
-        }}
-      />
+      <TonConnectButton />
     </div>
   );
 };
