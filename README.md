@@ -1,7 +1,7 @@
 # MazeTon 🌀 A Telegram Mini App AI-Generated Mazes Adventure
 
 <div style="text-align:center" align="center">
-    <img src="https://raw.githubusercontent.com/mazeton/mazeton.github.io/master/public/logo.png" width="400">
+    <img src="https://raw.githubusercontent.com/mazeton/mazeton.github.io/master/public/logo2.png" width="400">
 </div>
 
 Welcome to **MazeTon**, an immersive 3D AI-generated maze game designed as a Telegram Mini App! Navigate through challenging mazes, collect hidden treasures and challenge your friends - all in the familiar Telegram interface.
