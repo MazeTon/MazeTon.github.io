@@ -1,7 +1,10 @@
-// Profile.tsx
-
 import { Button } from "@/components/ui/button";
-import React, { useState } from "react";
+import {
+  ConnectedWallet,
+  TonConnectButton,
+  useTonConnectUI,
+} from "@tonconnect/ui-react";
+import React, { useEffect, useState } from "react";
 import { FaSave, FaUserCircle } from "react-icons/fa";
 
 interface ProfileProps {
@@ -13,12 +16,27 @@ interface ProfileProps {
 const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
   const [tonAddress, setTonAddress] = useState(userData.tonAddress || "");
   const [isSaving, setIsSaving] = useState(false);
+  const [tonConnectUI] = useTonConnectUI();
 
-  const handleTonAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTonAddress(e.target.value);
-  };
+  useEffect(() => {
+    tonConnectUI.onStatusChange((status) => {
+      if (status && (status as ConnectedWallet).account) {
+        const address = (status as ConnectedWallet).account.address;
+        setTonAddress(address);
+        window.Telegram.WebApp.showAlert(`Connected to TON Wallet: ${address}`);
+      } else {
+        setTonAddress("");
+        window.Telegram.WebApp.showAlert("Disconnected from TON Wallet.");
+      }
+    });
+  }, [tonConnectUI]);
 
   const handleSaveProfile = async () => {
+    if (!tonAddress) {
+      window.Telegram.WebApp.showAlert("Please connect your TON wallet first!");
+      return;
+    }
+
     setIsSaving(true);
     try {
       const response = await fetch(
@@ -41,13 +59,15 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
       const data = await response.json();
 
       if (response.ok) {
-        // Success, update the local userData if necessary
         console.log("Profile updated");
+        window.Telegram.WebApp.showAlert("Profile successfully updated!");
       } else {
         console.error("Error updating profile:", data.error);
+        window.Telegram.WebApp.showAlert(`Error: ${data.error}`);
       }
     } catch (error) {
       console.error("Error updating profile:", error);
+      window.Telegram.WebApp.showAlert("An unexpected error occurred.");
     } finally {
       setIsSaving(false);
     }
@@ -79,10 +99,11 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
           id="tonAddress"
           type="text"
           value={tonAddress}
-          onChange={handleTonAddressChange}
+          readOnly
           className="bg-gray-800 text-white p-2 rounded w-full text-sm focus:outline-none opacity-90 bg-teal-700/10 shadow-md"
         />
       </div>
+      <TonConnectButton />
       <Button
         onClick={handleSaveProfile}
         className="mt-4 text-sm flex items-center focus:outline-none hover:opacity-90 opacity-80 bg-teal-700/10 shadow-md"
