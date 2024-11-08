@@ -1,3 +1,4 @@
+import { convertToBase64Url } from "@/utils/addressUtils"; // Adjust the import path as needed
 import {
   ConnectedWallet,
   TonConnectButton,
@@ -38,9 +39,7 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
 
         const data = await response.json();
 
-        if (response.ok) {
-          window.Telegram.WebApp.showAlert("TON Address successfully saved!");
-        } else {
+        if (!response.ok) {
           console.error("Error saving address:", data.error);
           window.Telegram.WebApp.showAlert(`Error: ${data.error}`);
         }
@@ -55,10 +54,10 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
   useEffect(() => {
     const handleConnection = (status: ConnectedWallet | null) => {
       if (status?.account) {
-        const address = status.account.address;
-        setTonAddress(address);
-        saveAddressToDatabase(address);
-        window.Telegram.WebApp.showAlert(`Connected to TON Wallet: ${address}`);
+        const address = status.account.address; // Base64/standard address
+        const convertedAddress = convertToBase64Url(address); // Convert to Base64url
+        setTonAddress(convertedAddress);
+        saveAddressToDatabase(convertedAddress);
       } else {
         setTonAddress("");
       }
@@ -104,7 +103,7 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
         </p>
         <p className="text-sm mb-4">@{userData.username || `anonymous`}</p>
       </div>
-      <div className="w-full max-w-md text-center my-2">
+      <div className="w-full max-w-md text-center my-4">
         <p className="block text-sm mb-1">TON Address:</p>
         {tonAddress ? (
           <p className="bg-gray-800 text-white p-2 rounded text-sm opacity-90 bg-teal-700/10 shadow-md">
