@@ -53,17 +53,34 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
   );
 
   useEffect(() => {
-    tonConnectUI.onStatusChange((status) => {
-      if (status && (status as ConnectedWallet).account) {
-        const address = (status as ConnectedWallet).account.address;
+    const handleConnection = (status: ConnectedWallet | null) => {
+      if (status?.account) {
+        const address = status.account.address;
         setTonAddress(address);
         saveAddressToDatabase(address);
+        window.Telegram.WebApp.showAlert(`Connected to TON Wallet: ${address}`);
       } else {
         setTonAddress("");
-        window.Telegram.WebApp.showAlert("Disconnected from TON Wallet.");
+      }
+    };
+
+    const wallet = tonConnectUI.wallet;
+
+    // Check if the wallet is of type ConnectedWallet
+    if (wallet && "account" in wallet) {
+      handleConnection(wallet as ConnectedWallet);
+    } else {
+      handleConnection(null);
+    }
+
+    tonConnectUI.onStatusChange((status) => {
+      if (status && "account" in status) {
+        handleConnection(status as ConnectedWallet);
+      } else {
+        handleConnection(null);
       }
     });
-  }, [saveAddressToDatabase, tonConnectUI]);
+  }, [tonConnectUI, saveAddressToDatabase]);
 
   const formatAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-6)}`;
@@ -87,7 +104,7 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
         </p>
         <p className="text-sm mb-4">@{userData.username || `anonymous`}</p>
       </div>
-      <div className="w-full max-w-md text-center">
+      <div className="w-full max-w-md text-center my-2">
         <p className="block text-sm mb-1">TON Address:</p>
         {tonAddress ? (
           <p className="bg-gray-800 text-white p-2 rounded text-sm opacity-90 bg-teal-700/10 shadow-md">
