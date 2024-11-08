@@ -1,9 +1,5 @@
-import {
-  ConnectedWallet,
-  TonConnectButton,
-  useTonConnectUI,
-} from "@tonconnect/ui-react";
-import React, { useCallback, useEffect, useState } from "react";
+import { TonConnectButton, useTonAddress } from "@tonconnect/ui-react";
+import React, { useCallback, useEffect } from "react";
 import { FaUserCircle } from "react-icons/fa";
 
 interface ProfileProps {
@@ -13,8 +9,8 @@ interface ProfileProps {
 }
 
 const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
-  const [tonAddress, setTonAddress] = useState(userData.tonAddress || "");
-  const [tonConnectUI] = useTonConnectUI();
+  const userFriendlyAddress = useTonAddress(); // Default true for user-friendly format
+  const rawAddress = useTonAddress(false); // Get raw address
 
   const saveAddressToDatabase = useCallback(
     async (address: string) => {
@@ -51,33 +47,10 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
   );
 
   useEffect(() => {
-    const handleConnection = (status: ConnectedWallet | null) => {
-      if (status?.account) {
-        const address = status.account.address;
-        setTonAddress(address);
-        saveAddressToDatabase(address);
-      } else {
-        setTonAddress("");
-      }
-    };
-
-    const wallet = tonConnectUI.wallet;
-
-    // Check if the wallet is of type ConnectedWallet
-    if (wallet && "account" in wallet) {
-      handleConnection(wallet as ConnectedWallet);
-    } else {
-      handleConnection(null);
+    if (rawAddress) {
+      saveAddressToDatabase(rawAddress);
     }
-
-    tonConnectUI.onStatusChange((status) => {
-      if (status && "account" in status) {
-        handleConnection(status as ConnectedWallet);
-      } else {
-        handleConnection(null);
-      }
-    });
-  }, [tonConnectUI, saveAddressToDatabase]);
+  }, [rawAddress, saveAddressToDatabase]);
 
   const formatAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-6)}`;
@@ -103,9 +76,9 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
       </div>
       <div className="w-full max-w-md text-center my-4">
         <p className="block text-sm mb-1">TON Address:</p>
-        {tonAddress ? (
+        {userFriendlyAddress ? (
           <p className="bg-gray-800 text-white p-2 rounded text-sm opacity-90 bg-teal-700/10 shadow-md">
-            {formatAddress(tonAddress)}
+            {formatAddress(userFriendlyAddress)}
           </p>
         ) : (
           <p className="text-gray-500">Not connected</p>
