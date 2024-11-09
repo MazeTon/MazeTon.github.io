@@ -13,16 +13,15 @@ interface ProfileProps {
 const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
   const [maze, setMaze] = useState("0");
   const rawAddress = useTonAddress(false); // Get raw address
-  const connectedAddressString = useTonAddress();
 
   useEffect(() => {
-    if (!connectedAddressString || !ta || !ta.accounts) {
+    if (!rawAddress || !ta || !ta.accounts) {
       setMaze("0");
       return;
     }
 
     const addr = {
-      toRawString: () => connectedAddressString,
+      toRawString: () => rawAddress,
     };
 
     ta.accounts
@@ -47,7 +46,7 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
         }
       })
       .catch((err) => console.error(err.message || "Failed to fetch jettons"));
-  }, [connectedAddressString]);
+  }, [rawAddress]);
 
   const saveAddressToDatabase = useCallback(
     async (address: string) => {
