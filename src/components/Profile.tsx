@@ -1,4 +1,5 @@
 import ta from "@/tonapi";
+import { Address } from "@ton/core";
 import { TonConnectButton, useTonAddress } from "@tonconnect/ui-react";
 import React, { useCallback, useEffect, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
@@ -15,20 +16,29 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
   const connectedAddressString = useTonAddress();
 
   useEffect(() => {
-    if (!connectedAddressString) {
+    if (!connectedAddressString || !ta || !ta.accounts) {
       setMaze("0");
       return;
     }
 
+    const addr = {
+      toRawString: () => connectedAddressString,
+    };
+
     ta.accounts
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .getAccountJettonsBalances(connectedAddressString as any)
+      .getAccountJettonsBalances(addr as unknown as Address)
       .then((res) => {
         if (res && res.balances) {
           let balance = "0";
           res.balances.map((j) => {
-            if (j && j.jetton && j.balance && j.jetton.name === "MAZE") {
-              balance = j.balance.toString();
+            if (
+              j &&
+              j.jetton &&
+              j.balance &&
+              j.balance > 0n &&
+              j.jetton.name === "MAZE"
+            ) {
+              balance = (j.balance / BigInt(j.jetton.decimals)).toString();
             }
           });
           if (balance !== "0") {
