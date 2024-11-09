@@ -111,7 +111,8 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
       ) : (
         <div className="flex flex-col items-center my-6">
           <p>
-            <span className="text-green-400">$MAZE</span>: {maze} tokens
+            <span className="text-teal-400 text-2xl">{maze}</span>{" "}
+            <span className="text-green-400">$MAZE</span> tokens
           </p>
         </div>
       )}
