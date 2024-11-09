@@ -16,7 +16,7 @@ Embark on a journey through a world of vibrant mazes that evolve as you progress
 
 ## 🎮 How to Play
 
-1. **Start the Game**: Open the MazeTon WebApp through Telegram.
+1. **Start the Game**: Open the [MazeTon Telegram Mini App](https://t.me/mazetonbot/app).
 2. **Navigate the Maze**:
    - On **mobile devices**, swipe in the direction you wish to move.
    - On **desktop**, use the arrow keys or WASD keys.
@@ -54,6 +54,59 @@ MazeTon is designed specifically for Telegram, allowing you to play seamlessly w
 - **Score System**: Earn points for completing mazes, which add up to increase your rank.
 - **Item Collection**: Discover items hidden in mazes that can enhance gameplay or unlock special features.
 - **Referral Rewards**: Earn in-game bonuses by inviting friends to join MazeTon.
+
+## 🔒 Anti-Bot Protection
+
+To protect against bots, MazeTon implements various delays in the game. For example, when picking up an item, a 5-second animation will play. Additionally, each move takes 0.2 seconds.
+
+Knowing the minimum number of moves required to complete a maze, we calculate the fastest legitimate completion time. If a player completes the maze faster than this, they are flagged and penalized as follows:
+
+- **1st Violation**: 1-hour block.
+- **2nd Violation**: 2-hour block.
+- **3rd Violation**: 4-hour block.
+- Penalty durations double with each subsequent violation, up to a maximum of 24 hours.
+
+Additionally, **impassable mazes** will be introduced, requiring special superpowers (e.g., Wall Jump, Teleport) to complete. These will also factor into the minimum completion time to prevent abuse.
+
+## 🚀 Future Enhancements
+
+### 🛍️ In-Game Store
+
+A store will be added, allowing players to buy and sell items and superpowers. Example superpowers include:
+
+- **Wall Jump**: Skip over a wall.
+- **Teleport**: Move a few spaces forward instantly.
+- **Speed Boost**: Reduce movement time for a limited duration.
+- etc.
+
+### 💰 TON Wallet Integration
+
+Players will be able to withdraw earned score points to their TON wallets. This will be facilitated through a distribution mechanism on the TON blockchain.
+
+## 🌐 Tokenomics
+
+The MazeTon project will issue its own tokens, with allocation as follows:
+
+```markdown
+- Game Fund: 50%
+- Marketing: 30%
+- Community: 10%
+- Team: 5%
+- Presale: 5%
+```
+
+### Token Issuance Model
+
+The total number of tokens issued will be determined by the number of players. Since the maximum points a player can generate in 24 uninterrupted games is known, the token limit will be calculated based on player counts to ensure a sustainable economy.
+
+```mermaid
+pie title Total Tokens
+    "Game Fund" : 50
+    "Marketing" : 30
+    "Community" : 10
+    "Team" : 5
+    "Presale" : 5
+```
 
 ## 🛠 Technology Stack
 
@@ -96,22 +149,13 @@ MazeTon is designed specifically for Telegram, allowing you to play seamlessly w
   - Items appear in mazes larger than 10×10.
   - Positioned away from the start and finish to encourage exploration.
 
-### Fair Play Enforcement
-
-- **Anti-Cheat Measures**:
-  - Minimum completion time is enforced based on the shortest possible path.
-  - Players completing mazes suspiciously fast are temporarily blocked.
-- **Penalty System**:
-  - First offense results in a 1-hour block.
-  - Subsequent offenses double the block duration, up to 24 hours.
-
 ## 🚀 Getting Started
 
 ### Prerequisites
 
 - **Node.js** and **npm**: To run and build the project locally.
 - **AWS Account**: For deploying backend services.
-- **Telegram Bot Token**: To integrate with the Telegram WebApp API.
+- **Telegram Bot Token**: To integrate with the Telegram Mini App API.
 
 ### Installation
 
