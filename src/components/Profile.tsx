@@ -27,17 +27,16 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
         if (res && res.balances) {
           let balance = "0";
           res.balances.map((j) => {
-            if (j && j.jetton && j.jetton.name === "MAZE") {
+            if (j && j.jetton && j.balance && j.jetton.name === "MAZE") {
               balance = j.balance.toString();
             }
           });
-          if (maze) {
+          if (balance !== "0") {
             setMaze(balance);
           }
         }
       })
       .catch((err) => console.error(err.message || "Failed to fetch jettons"));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connectedAddressString]);
 
   const saveAddressToDatabase = useCallback(
