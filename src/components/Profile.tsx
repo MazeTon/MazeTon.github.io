@@ -1,5 +1,6 @@
+import ta from "@/tonapi";
 import { TonConnectButton, useTonAddress } from "@tonconnect/ui-react";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 
 interface ProfileProps {
@@ -9,7 +10,35 @@ interface ProfileProps {
 }
 
 const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
+  const [maze, setMaze] = useState("0");
   const rawAddress = useTonAddress(false); // Get raw address
+  const connectedAddressString = useTonAddress();
+
+  useEffect(() => {
+    if (!connectedAddressString) {
+      setMaze("0");
+      return;
+    }
+
+    ta.accounts
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .getAccountJettonsBalances(connectedAddressString as any)
+      .then((res) => {
+        if (res && res.balances) {
+          let balance = "0";
+          res.balances.map((j) => {
+            if (j && j.jetton && j.jetton.name === "MAZE") {
+              balance = j.balance.toString();
+            }
+          });
+          if (maze) {
+            setMaze(balance);
+          }
+        }
+      })
+      .catch((err) => console.error(err.message || "Failed to fetch jettons"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connectedAddressString]);
 
   const saveAddressToDatabase = useCallback(
     async (address: string) => {
@@ -68,6 +97,11 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
           {userData.firstName || `Anonymous`} {userData.lastName}
         </p>
         <p className="text-sm mb-4">@{userData.username || `anonymous`}</p>
+      </div>
+      <div className="flex flex-col items-center my-6">
+        <p>
+          <div className="text-green-400">$MAZE</div>: {maze} tokens
+        </p>
       </div>
       <TonConnectButton />
     </div>
