@@ -28,6 +28,8 @@ jobs:
 
       - name: Build
         run: pnpm build
+        env:
+          VITE_TONAPI_KEY: ${{ secrets.VITE_TONAPI_KEY }}
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
