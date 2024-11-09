@@ -35,7 +35,7 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
               j.jetton &&
               j.balance &&
               j.balance > 0n &&
-              j.jetton.name === "MAZE"
+              j.jetton.name.toLowerCase() === "maze"
             ) {
               balance = (j.balance / BigInt(j.jetton.decimals)).toString();
             }
@@ -106,11 +106,15 @@ const Profile: React.FC<ProfileProps> = ({ userData, initData }) => {
         </p>
         <p className="text-sm mb-4">@{userData.username || `anonymous`}</p>
       </div>
-      <div className="flex flex-col items-center my-6">
-        <p>
-          <div className="text-green-400">$MAZE</div>: {maze} tokens
-        </p>
-      </div>
+      {!rawAddress ? (
+        <div className="flex flex-col items-center my-6">Not Connected</div>
+      ) : (
+        <div className="flex flex-col items-center my-6">
+          <p>
+            <span className="text-green-400">$MAZE</span>: {maze} tokens
+          </p>
+        </div>
+      )}
       <TonConnectButton />
     </div>
   );
