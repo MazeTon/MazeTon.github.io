@@ -640,24 +640,30 @@ const Game: React.FC = () => {
       const relativeX = clickX - rect.left;
       const relativeY = clickY - rect.top;
 
-      const isTopHalf = relativeY < rect.height / 2;
-      const isLeftHalf = relativeX < rect.width / 2;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
 
-      if (isTopHalf) {
-        if (isLeftHalf) {
-          // Top-left: move up
+      // Calculate relative position to center diagonals
+      const dx = relativeX - centerX;
+      const dy = relativeY - centerY;
+
+      if (Math.abs(dy) > Math.abs(dx)) {
+        // Vertical dominant
+        if (dy < 0) {
+          // Top: move up
           movePlayer(0, -1);
         } else {
-          // Top-right: move right
-          movePlayer(1, 0);
+          // Bottom: move down
+          movePlayer(0, 1);
         }
       } else {
-        if (isLeftHalf) {
-          // Bottom-left: move left
+        // Horizontal dominant
+        if (dx < 0) {
+          // Left: move left
           movePlayer(-1, 0);
         } else {
-          // Bottom-right: move down
-          movePlayer(0, 1);
+          // Right: move right
+          movePlayer(1, 0);
         }
       }
     },
@@ -697,7 +703,9 @@ const Game: React.FC = () => {
 
     if (gameArea) {
       gameArea.addEventListener("dblclick", handleDoubleClick);
-      gameArea.addEventListener("touchend", handleDoubleTouch);
+      gameArea.addEventListener("touchend", handleDoubleTouch, {
+        passive: false,
+      });
 
       return () => {
         gameArea.removeEventListener("dblclick", handleDoubleClick);
