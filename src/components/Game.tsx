@@ -481,6 +481,7 @@ const Game: React.FC = () => {
   const lastScrollTime = useRef(0);
   const gameAreaRef = useRef<HTMLDivElement>(null);
   const lastTapTimeRef = useRef(0);
+  const lastTouchPositionRef = useRef({ x: 0, y: 0 });
 
   // Detect swipe gestures for mobile
   const handleTouchStart = useCallback((event: TouchEvent) => {
@@ -660,14 +661,25 @@ const Game: React.FC = () => {
       if (gameWon || loading || penaltyTime) return;
 
       const now = Date.now();
+      const touch = event.changedTouches[0];
+
+      if (!touch) return;
+
+      const touchPosition = { x: touch.clientX, y: touch.clientY };
       const timeSinceLastTap = now - lastTapTimeRef.current;
 
-      if (timeSinceLastTap < 300 && timeSinceLastTap > 0) {
-        // Treat as a double-tap
+      const isSamePosition = lastTouchPositionRef.current
+        ? Math.abs(touchPosition.x - lastTouchPositionRef.current.x) < 20 &&
+          Math.abs(touchPosition.y - lastTouchPositionRef.current.y) < 20
+        : false;
+
+      if (timeSinceLastTap < 300 && isSamePosition) {
+        // Double-tap detected
         handleDoubleClick(event);
       }
 
       lastTapTimeRef.current = now;
+      lastTouchPositionRef.current = touchPosition;
     },
     [gameWon, loading, penaltyTime, handleDoubleClick]
   );
