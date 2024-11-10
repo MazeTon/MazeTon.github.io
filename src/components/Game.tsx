@@ -672,30 +672,54 @@ const Game: React.FC = () => {
 
   const handleDoubleTouch = useCallback(
     (event: TouchEvent) => {
-      if (gameWon || loading || penaltyTime) return;
+      if (event.changedTouches.length === 1) {
+        const touchEndX = event.changedTouches[0].clientX;
+        const touchEndY = event.changedTouches[0].clientY;
 
-      const now = Date.now();
-      const touch = event.changedTouches[0];
+        const dx = touchEndX - touchStartX.current;
+        const dy = touchEndY - touchStartY.current;
 
-      if (!touch) return;
+        const now = Date.now();
+        const timeSinceLastTap = now - lastTapTimeRef.current;
+        const isSamePosition = lastTouchPositionRef.current
+          ? Math.abs(touchEndX - lastTouchPositionRef.current.x) < 30 &&
+            Math.abs(touchEndY - lastTouchPositionRef.current.y) < 30
+          : false;
 
-      const touchPosition = { x: touch.clientX, y: touch.clientY };
-      const timeSinceLastTap = now - lastTapTimeRef.current;
+        lastTouchPositionRef.current = { x: touchEndX, y: touchEndY };
 
-      const isSamePosition = lastTouchPositionRef.current
-        ? Math.abs(touchPosition.x - lastTouchPositionRef.current.x) < 20 &&
-          Math.abs(touchPosition.y - lastTouchPositionRef.current.y) < 20
-        : false;
+        // Double-tap detection
+        if (timeSinceLastTap < 300 && isSamePosition) {
+          handleDoubleClick(event); // Double-tap detected
+          lastTapTimeRef.current = 0; // Reset tap time
+          return;
+        }
 
-      if (timeSinceLastTap < 300 && isSamePosition) {
-        // Double-tap detected
-        handleDoubleClick(event);
+        lastTapTimeRef.current = now;
+
+        // Swipe detection
+        if (Math.abs(dx) > SWIPE_THRESHOLD || Math.abs(dy) > SWIPE_THRESHOLD) {
+          event.preventDefault();
+
+          if (Math.abs(dx) > Math.abs(dy)) {
+            // Horizontal swipe
+            if (dx > 0) {
+              movePlayer(-1, 0);
+            } else {
+              movePlayer(1, 0);
+            }
+          } else {
+            // Vertical swipe
+            if (dy > 0) {
+              movePlayer(0, -1);
+            } else {
+              movePlayer(0, 1);
+            }
+          }
+        }
       }
-
-      lastTapTimeRef.current = now;
-      lastTouchPositionRef.current = touchPosition;
     },
-    [gameWon, loading, penaltyTime, handleDoubleClick]
+    [movePlayer, handleDoubleClick]
   );
 
   useEffect(() => {
