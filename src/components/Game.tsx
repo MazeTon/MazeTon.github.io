@@ -62,13 +62,17 @@ const Game: React.FC = () => {
   const tgRef = useRef(window.Telegram?.WebApp);
   const initData = useRef(window.Telegram?.WebApp?.initData);
 
-  useEffect(() => {
-    if (tgRef.current) {
-      tgRef.current.ready();
-      tgRef.current.expand();
-      tgRef.current.disableVerticalSwipes();
-    }
-  }, []);
+  tgRef.current.ready();
+  tgRef.current.expand();
+  tgRef.current.disableVerticalSwipes();
+
+  // useEffect(() => {
+  //   if (tgRef.current) {
+  //     tgRef.current.ready();
+  //     tgRef.current.expand();
+  //     tgRef.current.disableVerticalSwipes();
+  //   }
+  // }, []);
 
   console.log("tgRef", tgRef);
 
