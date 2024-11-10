@@ -38,7 +38,7 @@ const Header: React.FC<HeaderProps> = ({
         </button>
       </div>
 
-      <div className="flex flex-col items-center text-lg relative font-['Tektur'] overflow-hidden w-full">
+      <div className="flex flex-col items-center text-lg relative font-['Tektur'] overflow-hidden w-full pointer-events-none">
         <div className="absolute inset-0 flex items-center justify-center text-6xl text-white opacity-5 font-['Rubik_Maze']">
           {score}
         </div>
