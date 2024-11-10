@@ -480,6 +480,7 @@ const Game: React.FC = () => {
   const touchStartY = useRef(0);
   const lastScrollTime = useRef(0);
   const gameAreaRef = useRef<HTMLDivElement>(null);
+  const lastTapTimeRef = useRef(0);
 
   // Detect swipe gestures for mobile
   const handleTouchStart = useCallback((event: TouchEvent) => {
@@ -610,6 +611,71 @@ const Game: React.FC = () => {
       };
     }
   }, [handleTouchStart, handleTouchEnd, handleWheel, currentView]);
+
+  const handleDoubleClick = useCallback(
+    (event: MouseEvent | TouchEvent) => {
+      if (gameWon || loading || penaltyTime) return;
+
+      const rect = gameAreaRef.current?.getBoundingClientRect();
+      if (!rect) return;
+
+      const clickX =
+        (event as MouseEvent).clientX ||
+        (event as TouchEvent).touches[0]?.clientX;
+      const clickY =
+        (event as MouseEvent).clientY ||
+        (event as TouchEvent).touches[0]?.clientY;
+
+      if (clickX == null || clickY == null) return;
+
+      const relativeX = clickX - rect.left;
+      const relativeY = clickY - rect.top;
+
+      const isTopHalf = relativeY < rect.height / 2;
+      const isLeftHalf = relativeX < rect.width / 2;
+
+      if (isTopHalf) {
+        if (isLeftHalf) {
+          // Top-left: move up
+          movePlayer(0, -1);
+        } else {
+          // Top-right: move right
+          movePlayer(1, 0);
+        }
+      } else {
+        if (isLeftHalf) {
+          // Bottom-left: move left
+          movePlayer(-1, 0);
+        } else {
+          // Bottom-right: move down
+          movePlayer(0, 1);
+        }
+      }
+    },
+    [gameWon, loading, penaltyTime, movePlayer]
+  );
+
+  useEffect(() => {
+    const gameArea = gameAreaRef.current;
+
+    if (gameArea) {
+      gameArea.addEventListener("dblclick", handleDoubleClick);
+      gameArea.addEventListener("touchend", (event) => {
+        if (event.touches.length === 0 && event.changedTouches.length === 1) {
+          // Detect quick double-tap by timing between last tap
+          const now = Date.now();
+          if (now - lastTapTimeRef.current < 100) {
+            handleDoubleClick(event);
+          }
+          lastTapTimeRef.current = now;
+        }
+      });
+
+      return () => {
+        gameArea.removeEventListener("dblclick", handleDoubleClick);
+      };
+    }
+  }, [handleDoubleClick]);
 
   // Handle penalty time display
   useEffect(() => {
