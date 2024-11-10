@@ -680,9 +680,6 @@ const Game: React.FC = () => {
         const touchEndX = event.changedTouches[0].clientX;
         const touchEndY = event.changedTouches[0].clientY;
 
-        const dx = touchEndX - touchStartX.current;
-        const dy = touchEndY - touchStartY.current;
-
         const now = Date.now();
         const timeSinceLastTap = now - lastTapTimeRef.current;
         const isSamePosition = lastTouchPositionRef.current
@@ -700,30 +697,9 @@ const Game: React.FC = () => {
         }
 
         lastTapTimeRef.current = now;
-
-        // Swipe detection
-        if (Math.abs(dx) > SWIPE_THRESHOLD || Math.abs(dy) > SWIPE_THRESHOLD) {
-          event.preventDefault();
-
-          if (Math.abs(dx) > Math.abs(dy)) {
-            // Horizontal swipe
-            if (dx > 0) {
-              movePlayer(-1, 0);
-            } else {
-              movePlayer(1, 0);
-            }
-          } else {
-            // Vertical swipe
-            if (dy > 0) {
-              movePlayer(0, -1);
-            } else {
-              movePlayer(0, 1);
-            }
-          }
-        }
       }
     },
-    [movePlayer, handleDoubleClick]
+    [handleDoubleClick]
   );
 
   useEffect(() => {
