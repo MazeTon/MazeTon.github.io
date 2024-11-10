@@ -64,7 +64,7 @@ const Game: React.FC = () => {
 
   tgRef.current.ready();
   tgRef.current.expand();
-  tgRef.current.disableVerticalSwipes();
+  tgRef.current.enableVerticalSwipes();
 
   // useEffect(() => {
   //   if (tgRef.current) {
