@@ -92,24 +92,71 @@
 }
 
 @keyframes swipeAnim {
-  0%,
-  100% {
-    transform: translateX(20px);
+  0% {
+    transform: translateX(-40px) scale(1);
+  }
+  2% {
+    transform: translateX(-40px) scale(0.8);
+  }
+  4% {
+    transform: translateX(-40px) scale(1);
+  }
+  6% {
+    transform: translateX(-40px) scale(0.8);
+  }
+  8% {
+    transform: translateX(-40px) scale(1);
   }
   25% {
-    transform: translateX(-20px);
+    transform: translateX(40px) scale(1);
   }
-  37.5% {
-    transform: translateX(0px);
+  27% {
+    transform: translateX(40px) scale(0.8);
   }
-  50% {
-    transform: translateY(-40px);
+  29% {
+    transform: translateX(40px) scale(1);
   }
-  62.5% {
-    transform: translateY(0px);
+  31% {
+    transform: translateX(40px) scale(0.8);
+  }
+  33% {
+    transform: translateX(40px) scale(1);
+  }
+  40% {
+    transform: translateY(0px) scale(1);
+  }
+  52.5% {
+    transform: translateY(40px) scale(1);
+  }
+  54.5% {
+    transform: translateY(40px) scale(0.8);
+  }
+  56.5% {
+    transform: translateY(40px) scale(1);
+  }
+  58.5% {
+    transform: translateY(40px) scale(0.8);
+  }
+  70.5% {
+    transform: translateY(40px) scale(1);
   }
   75% {
-    transform: translateY(-10px);
+    transform: translateY(-40px) scale(1);
+  }
+  77% {
+    transform: translateY(-40px) scale(0.8);
+  }
+  79% {
+    transform: translateY(-40px) scale(1);
+  }
+  81% {
+    transform: translateY(-40px) scale(0.8);
+  }
+  83% {
+    transform: translateY(-40px) scale(1);
+  }
+  100% {
+    transform: scale(1);
   }
 }
 

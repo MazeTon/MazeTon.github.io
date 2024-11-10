@@ -664,7 +664,7 @@ const Game: React.FC = () => {
         if (event.touches.length === 0 && event.changedTouches.length === 1) {
           // Detect quick double-tap by timing between last tap
           const now = Date.now();
-          if (now - lastTapTimeRef.current < 100) {
+          if (now - lastTapTimeRef.current < 300) {
             handleDoubleClick(event);
           }
           lastTapTimeRef.current = now;
