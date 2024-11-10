@@ -655,27 +655,36 @@ const Game: React.FC = () => {
     [gameWon, loading, penaltyTime, movePlayer]
   );
 
+  const handleDoubleTouch = useCallback(
+    (event: TouchEvent) => {
+      if (gameWon || loading || penaltyTime) return;
+
+      const now = Date.now();
+      const timeSinceLastTap = now - lastTapTimeRef.current;
+
+      if (timeSinceLastTap < 300 && timeSinceLastTap > 0) {
+        // Treat as a double-tap
+        handleDoubleClick(event);
+      }
+
+      lastTapTimeRef.current = now;
+    },
+    [gameWon, loading, penaltyTime, handleDoubleClick]
+  );
+
   useEffect(() => {
     const gameArea = gameAreaRef.current;
 
     if (gameArea) {
       gameArea.addEventListener("dblclick", handleDoubleClick);
-      gameArea.addEventListener("touchend", (event) => {
-        if (event.touches.length === 0 && event.changedTouches.length === 1) {
-          // Detect quick double-tap by timing between last tap
-          const now = Date.now();
-          if (now - lastTapTimeRef.current < 300) {
-            handleDoubleClick(event);
-          }
-          lastTapTimeRef.current = now;
-        }
-      });
+      gameArea.addEventListener("touchend", handleDoubleTouch);
 
       return () => {
         gameArea.removeEventListener("dblclick", handleDoubleClick);
+        gameArea.removeEventListener("touchend", handleDoubleTouch);
       };
     }
-  }, [handleDoubleClick]);
+  }, [handleDoubleClick, handleDoubleTouch]);
 
   // Handle penalty time display
   useEffect(() => {
