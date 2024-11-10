@@ -634,10 +634,10 @@ const Game: React.FC = () => {
 
       const clickX =
         (event as MouseEvent).clientX ||
-        (event as TouchEvent).touches[0]?.clientX;
+        (event as TouchEvent).changedTouches[0]?.clientX;
       const clickY =
         (event as MouseEvent).clientY ||
-        (event as TouchEvent).touches[0]?.clientY;
+        (event as TouchEvent).changedTouches[0]?.clientY;
 
       if (clickX == null || clickY == null) return;
 
