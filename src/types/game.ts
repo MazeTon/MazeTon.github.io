@@ -37,6 +37,8 @@ export interface HeaderProps {
   isSoundMuted: boolean;
   toggleSimpleMap: () => void;
   handleMuteToggle: () => void;
+  inverse: boolean;
+  toggleInverse: () => void;
 }
 
 export interface MazeProps {

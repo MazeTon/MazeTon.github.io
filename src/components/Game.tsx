@@ -55,6 +55,7 @@ const Game: React.FC = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [userData, setUserData] = useState<any>({});
   const [userId, setUserId] = useState<string>("");
+  const [inverse, setInverse] = useState(false);
 
   const mazeCompletionSent = useRef(false);
 
@@ -63,6 +64,7 @@ const Game: React.FC = () => {
 
   console.log("tgRef", tgRef);
 
+  const toggleInverse = () => setInverse((prev) => !prev);
   const toggleSimpleMap = () => setShowSimpleMap((prev) => !prev);
 
   const handleMuteToggle = () => {
@@ -503,22 +505,38 @@ const Game: React.FC = () => {
           if (Math.abs(dx) > Math.abs(dy)) {
             // Horizontal swipe
             if (dx > 0) {
-              movePlayer(-1, 0); // Swipe right
+              if (inverse) {
+                movePlayer(1, 0); // Swipe left
+              } else {
+                movePlayer(-1, 0); // Swipe right
+              }
             } else {
-              movePlayer(1, 0); // Swipe left
+              if (inverse) {
+                movePlayer(-1, 0); // Swipe right
+              } else {
+                movePlayer(1, 0); // Swipe left
+              }
             }
           } else {
             // Vertical swipe
             if (dy > 0) {
-              movePlayer(0, -1); // Swipe down
+              if (inverse) {
+                movePlayer(0, 1); // Swipe up
+              } else {
+                movePlayer(0, -1); // Swipe down
+              }
             } else {
-              movePlayer(0, 1); // Swipe up
+              if (inverse) {
+                movePlayer(0, -1); // Swipe down
+              } else {
+                movePlayer(0, 1); // Swipe up
+              }
             }
           }
         }
       }
     },
-    [movePlayer]
+    [movePlayer, inverse]
   );
 
   // Throttled scroll-based movement
@@ -537,23 +555,39 @@ const Game: React.FC = () => {
         if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
           // Vertical scroll
           if (event.deltaY > 0) {
-            movePlayer(0, 1); // Scroll down
+            if (inverse) {
+              movePlayer(0, 1); // Scroll down
+            } else {
+              movePlayer(0, -1); // Scroll up
+            }
           } else {
-            movePlayer(0, -1); // Scroll up
+            if (inverse) {
+              movePlayer(0, -1); // Scroll up
+            } else {
+              movePlayer(0, 1); // Scroll down
+            }
           }
         } else {
           // Horizontal scroll
           if (event.deltaX > 0) {
-            movePlayer(1, 0); // Scroll right
+            if (inverse) {
+              movePlayer(1, 0); // Scroll right
+            } else {
+              movePlayer(-1, 0); // Scroll left
+            }
           } else {
-            movePlayer(-1, 0); // Scroll left
+            if (inverse) {
+              movePlayer(-1, 0); // Scroll left
+            } else {
+              movePlayer(1, 0); // Scroll right
+            }
           }
         }
 
         lastScrollTime.current = now; // Update last scroll time
       }
     },
-    [movePlayer]
+    [movePlayer, inverse]
   );
 
   useEffect(() => {
@@ -614,6 +648,8 @@ const Game: React.FC = () => {
         isSoundMuted={isSoundMuted}
         toggleSimpleMap={toggleSimpleMap}
         handleMuteToggle={handleMuteToggle}
+        inverse={inverse}
+        toggleInverse={toggleInverse}
       />
       <div className="w-full h-full z-10">
         {currentView === "play" && (
