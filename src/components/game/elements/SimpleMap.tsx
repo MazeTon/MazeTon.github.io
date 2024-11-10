@@ -7,7 +7,6 @@ const SimpleMap: React.FC<SimpleMapProps> = ({
   finishPosition,
   mazeSize,
   wallColor,
-  floorColor,
   playerColor,
   portalColor,
 }) => {
@@ -72,7 +71,7 @@ const SimpleMap: React.FC<SimpleMapProps> = ({
           overflow: "auto",
           border: "2px solid rgba(255, 255, 255, 0.3)",
           borderRadius: "8px",
-          backgroundColor: floorColor,
+          backgroundColor: "transparent",
         }}
       >
         <div
